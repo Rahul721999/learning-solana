@@ -1,11 +1,6 @@
 ## TypeScript projects
-# Ignore at the root level
-/node_modules
-!/dist/
-
-# Ignore node_modules in all nested directories
-**/node_modules
-!**/dist/
+node_modules/
+dist/
 
 # Rust projects
 debug/
