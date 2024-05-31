@@ -34,12 +34,8 @@ export const transferSol = async (
 };
 
 (async () => {
-    const fromPubKey = new PublicKey(
-        "Exbk3iBjek2fgEWKsEtjSgWSizNGZqpN859iYG1FLrph"
-    );
-    const toPubKey = new PublicKey(
-        "FQ8QD5R9DHtQVvbK485gPHYVWsX4yD7o6gR7zTRb3aep"
-    );
+    const fromPubKey = new PublicKey(process.env.SENDER_PUB_KEY!);
+    const toPubKey = new PublicKey(process.env.RECEIVER_PUB_KEY!);
     const amount = parseFloat(process.env.SOL_AMOUNT_TO_SEND!);
 
     const initialSenderBalance = await solBalance(fromPubKey);
@@ -55,8 +51,8 @@ export const transferSol = async (
         const secret = Uint8Array.from(JSON.parse(secret_str));
         const keypair = Keypair.fromSecretKey(secret);
         await transferSol(keypair, toPubKey, amount);
-    }else{
-      console.log("SENDER_PRIVATE_KEY is not set in environment variables");
+    } else {
+        console.log("SENDER_PRIVATE_KEY is not set in environment variables");
     }
     try {
     } catch (error) {
@@ -81,6 +77,3 @@ export const transferSol = async (
         throw error;
     }
 })();
-function validateBase58(arg0: string) {
-    throw new Error("Function not implemented.");
-}
