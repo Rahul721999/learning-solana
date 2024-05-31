@@ -2,9 +2,8 @@ import { config } from "dotenv";
 config();
 import { Connection, PublicKey, LAMPORTS_PER_SOL } from "@solana/web3.js";
 
-export const solBalance = async (address: String) => {
+export const solBalance = async (publickey: PublicKey) => {
   try {
-    const publickey = new PublicKey(address);
     const conn = new Connection(process.env.SOLANA_RPC_URL!, "confirmed");
 
     const accountInfo = await conn.getAccountInfo(publickey);
@@ -23,7 +22,7 @@ export const solBalance = async (address: String) => {
 
 (async () => {
   try {
-    const balance = await solBalance(process.env.WALLET_SECRET_KEY!);
+    const balance = await solBalance(new PublicKey(process.env.WALLET_SECRET_KEY!));
     console.log(balance);
   } catch (error) {
     console.log('Error: ',error);
