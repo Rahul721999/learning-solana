@@ -9,7 +9,9 @@
   "dependencies": {
     "@solana/spl-token": "^0.1.8",
     "@solana/web3.js": "^1.91.8",
+    "@types/node": "^20.14.2",
     "dotenv": "^16.4.5",
+    "ts-node": "^10.9.2",
     "typescript": "^5.4.5"
   },
   "devDependencies": {
