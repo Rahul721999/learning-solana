@@ -21,7 +21,7 @@ pub enum CalculatorInstruction {
     Add{
         data: u32,
     },
-    Substract{
+    Subtract{
         data: u32,
     },
 }
@@ -57,7 +57,7 @@ pub fn process_instruction(
             msg!("Adding data");
             greeting_account.counter += data;
         },
-        CalculatorInstruction::Substract{
+        CalculatorInstruction::Subtract{
             data
         } =>{
             msg!("Adding data");

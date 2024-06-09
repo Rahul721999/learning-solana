@@ -1,3 +1,5 @@
+import { deserialize, Schema } from "borsh";
+
 // Greeting class that holds the counter number
 export class GreetingAccount {
     counter: number;
@@ -25,7 +27,7 @@ export class Subtract {
 }
 
 // define schemas for Borsh serialization
-export const GreetingAccountSchema = new Map([
+export const GreetingAccountSchema : Schema = new Map([
     [
         GreetingAccount,
         {
@@ -35,7 +37,7 @@ export const GreetingAccountSchema = new Map([
     ],
 ]);
 
-export const CalculatorInstructionSchema = new Map([
+export const CalculatorInstructionSchema : Schema = new Map([
     [
         Add,
         {
@@ -51,3 +53,9 @@ export const CalculatorInstructionSchema = new Map([
         },
     ],
 ]);
+
+
+// Deserialize data using the schema
+export function deserializeData(schema: Schema, classType: any, buffer: Buffer): any {
+    return deserialize(schema, classType, buffer);
+}
