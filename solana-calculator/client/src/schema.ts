@@ -9,19 +9,19 @@ export class GreetingAccount {
     }
 }
 
-// Add Class used to increase counter
-export class Add {
-    data: number;
-
-    constructor(properties: { data: number }) {
-        this.data = properties.data;
-    }
+// Enum for Calculator Instructions
+export enum CalculatorInstruction {
+    Add = "Add",
+    Subtract = "Subtract",
 }
-// Add Class used to decrease counter
-export class Subtract {
+
+// Instruction Data Class
+export class InstructionData {
+    instruction: CalculatorInstruction;
     data: number;
 
-    constructor(properties: { data: number }) {
+    constructor(properties: { instruction: CalculatorInstruction; data: number }) {
+        this.instruction = properties.instruction;
         this.data = properties.data;
     }
 }
@@ -36,23 +36,16 @@ export const GreetingAccountSchema : Schema = new Map([
         },
     ],
 ]);
-
-export const CalculatorInstructionSchema : Schema = new Map([
+export const CalculatorInstructionSchema: Schema = new Map([
     [
-        Add,
+        InstructionData,
         {
             kind: "struct",
-            fields: [["data", "u32"]],
-        },
-    ],
-    [
-        Subtract,
-        {
-            kind: "struct",
-            fields: [["data", "u32"]],
+            fields: [["instruction", "u8"], ["data", "u32"]],
         },
     ],
 ]);
+
 
 
 // Deserialize data using the schema

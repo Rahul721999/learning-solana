@@ -7,6 +7,7 @@ import {
 import {
     GreetingAccount,
     CalculatorInstructionSchema,
+    InstructionData,
 } from "./schema";
 import { serialize, deserialize, Schema } from "borsh";
 import { CONNECTION, PROGRAM_ID } from ".";
@@ -28,12 +29,17 @@ export async function createTransactionInstruction(
     programId: PublicKey,
     accountPublicKey: PublicKey
 ): Promise<Transaction> {
-    const instructionData = serializeInstruction(new instructionType({ data }));
+    const instructionData = new InstructionData({
+        instruction: instructionType,
+        data,
+    });
+
+    const serializeData = serializeInstruction(instructionData);
 
     const instruction = new TransactionInstruction({
         keys: [{ pubkey: accountPublicKey, isSigner: false, isWritable: true }],
         programId: programId,
-        data: Buffer.from(instructionData),
+        data: Buffer.from(serializeData),
     });
 
     const transaction = new Transaction().add(instruction);
@@ -58,7 +64,7 @@ export async function sendTransaction(
     transaction.feePayer = payer.publicKey;
 
     // signing the transaction
-    // transaction.sign(payer);
+    transaction.sign(payer);
 
     // serialize and send the transaction
     const rawTransaction = transaction.serialize();
