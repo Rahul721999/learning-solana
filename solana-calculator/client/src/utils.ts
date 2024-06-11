@@ -4,6 +4,7 @@ import {
     Transaction,
     TransactionInstruction,
 } from "@solana/web3.js";
+import * as fs from "fs";
 import {
     GreetingAccount,
     CalculatorInstructionSchema,
@@ -78,4 +79,22 @@ export async function sendTransaction(
         "confirmed"
     );
     return signature;
+}
+
+/* ----------------------------------Helper functions----------------------------------*/
+export function getEnvVar(name: string): string {
+    const value = process.env[name];
+    if (!value) {
+        throw new Error(`Environment variable ${name} is not set`);
+    }
+    return value;
+}
+
+export function readKeypairFromFile(filePath: string): Keypair {
+    const fileContent = fs.readFileSync(filePath, "utf8");
+    const secretKey = JSON.parse(fileContent);
+    if (!Array.isArray(secretKey)) {
+        throw new Error(`Invalid key format in ${filePath}`);
+    }
+    return Keypair.fromSecretKey(new Uint8Array(secretKey));
 }

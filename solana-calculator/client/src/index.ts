@@ -1,6 +1,6 @@
 import { config } from "dotenv";
 config();
-import * as fs from "fs";
+
 import {
     Connection,
     PublicKey,
@@ -9,36 +9,19 @@ import {
     sendAndConfirmTransaction,
     SystemProgram,
 } from "@solana/web3.js";
-import { sendTransaction } from "./utils";
+import { sendTransaction, getEnvVar, readKeypairFromFile } from "./utils";
 import {
-    InstructionData,
-    CalculatorInstructionSchema,
     deserializeData,
     CalculatorInstruction,
     GreetingAccountSchema,
     GreetingAccount,
 } from "./schema";
 
-function getEnvVar(name: string): string {
-    const value = process.env[name];
-    if (!value) {
-        throw new Error(`Environment variable ${name} is not set`);
-    }
-    return value;
-}
 
 export const PROGRAM_ID = new PublicKey(getEnvVar("PROGRAM_ID"));
 const SOLANA_RPC_URL = getEnvVar("SOLANA_RPC_URL");
 export const CONNECTION = new Connection(SOLANA_RPC_URL, "confirmed");
 
-function readKeypairFromFile(filePath: string): Keypair {
-    const fileContent = fs.readFileSync(filePath, "utf8");
-    const secretKey = JSON.parse(fileContent);
-    if (!Array.isArray(secretKey)) {
-        throw new Error(`Invalid key format in ${filePath}`);
-    }
-    return Keypair.fromSecretKey(new Uint8Array(secretKey));
-}
 
 const FUND_PAYER = readKeypairFromFile("./fund_payer.json");
 
