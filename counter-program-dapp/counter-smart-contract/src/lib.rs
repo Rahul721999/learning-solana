@@ -10,29 +10,29 @@ use solana_program::{
 
 
 #[derive(Debug, BorshDeserialize, BorshSerialize)]
-pub struct CalculationAccount{
+pub struct CounterAccount{
     pub counter : u8,
 }
 
 #[derive(Debug, BorshDeserialize, BorshSerialize, PartialEq, Clone)]
-pub enum{
-    Add{data: u32},
-    Subtract{data: u32}
+pub enum Instructions{
+    Add{data: u8},
+    Subtract{data: u8}
 }
 
 
 entrypoint!(main);
 pub fn main(
-    program_id: Pubkey,
+    program_id: &Pubkey,
     accounts: &[AccountInfo],
     instruction_data: &[u8]
 ) -> ProgramResult{
     // Destructuring instruction data..
-    let instruction = CalculationAccount::try_from_slice(instruction_data)
-        .map_err(|_| ProgramError::InvalidInstructionData);
+    let instruction = Instructions::try_from_slice(instruction_data)
+        .map_err(|_| ProgramError::InvalidInstructionData)?;
 
     // Get the account to say Hello to
-    let account_iter = &mut account.iter();
+    let account_iter = &mut accounts.iter();
     let account = next_account_info(account_iter)?;
 
     // Match the account id with program id
@@ -41,13 +41,13 @@ pub fn main(
         return Err(ProgramError::IncorrectProgramId);
     }
 
-    let greeting_account = CalculationAccount::try_from_slice(&account.data.borrow())?;
+    let mut greeting_account = CounterAccount::try_from_slice(&account.data.borrow())?;
     match instruction{
-        CalculationAccount::Add{data} => {
+        Instructions::Add{data} => {
             msg!("Adding data");
             greeting_account.counter += data;
         },
-        CalculationAccount::Subtract{data} =>{
+        Instructions::Subtract{data} =>{
             msg!("Subtracting data");
             greeting_account.counter -= data;
         }
