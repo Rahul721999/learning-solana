@@ -21,7 +21,7 @@ describe("hello_anchor", () => {
 
         // Create the new account and initialize it with the program.
         await program.methods
-            .initialize(new anchor.BN(0)) // Setting initial data value explicitly
+            .initialize() // Setting initial data value explicitly
             .accounts({
                 myAccount: myAccount.publicKey,
                 user: provider.wallet.publicKey,

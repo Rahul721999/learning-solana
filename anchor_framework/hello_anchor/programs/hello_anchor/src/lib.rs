@@ -6,9 +6,9 @@ declare_id!("GrpeGwCk8Rp44qx9gnwNXVEP9VU9fegmu7ZnWmkEo2eC");
 mod hello_anchor {
     use super::*;
 
-    pub fn initialize(ctx: Context<Initialize>, data: u64) -> Result<()> {
+    pub fn initialize(ctx: Context<Initialize>) -> Result<()> {
         let my_account = &mut ctx.accounts.my_account;
-        my_account.data = data;
+        my_account.data = 0;
         Ok(())
     }
 
