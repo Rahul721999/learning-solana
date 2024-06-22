@@ -14,11 +14,15 @@ import React, { FC, ReactNode, useMemo } from "react";
 import "./App.css";
 import { Calculator } from "./Calculator";
 
+require("@solana/wallet-adapter-react-ui/styles.css");
+
 export default function App() {
+    
     return (
         <Context>
-            <div className="Calculator">
+            <div className="App">
                 <Calculator />
+                <WalletMultiButton />
             </div>
         </Context>
     );
