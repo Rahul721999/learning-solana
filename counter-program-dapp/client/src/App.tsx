@@ -35,7 +35,7 @@ const Context: FC<{ children: ReactNode }> = ({ children }) => {
     // You can also provide a custom RPC endpoint.
     const endpoint = useMemo(() => clusterApiUrl(network), [network]);
 
-    const wallets = useMemo(() => [new UnsafeBurnerWalletAdapter()], [network]);
+    const wallets = useMemo(() => [new UnsafeBurnerWalletAdapter()], []);
 
     return (
         <ConnectionProvider endpoint={endpoint}>
