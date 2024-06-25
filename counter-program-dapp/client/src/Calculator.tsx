@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from "react";
-import {SystemProgram } from "@solana/web3.js";
 import {
     useAnchorWallet,
     useConnection,
@@ -8,11 +7,14 @@ import {
 import idl from "./idl.json";
 import { getProvider } from "./util";
 import { Program, web3 } from "@project-serum/anchor";
+import { Keypair, SystemProgram } from "@solana/web3.js";
 
 export const Calculator: React.FC = () => {
     const [count, setCount] = useState<number>(0);
     const [balance, setBalance] = useState<number>(0);
-    const [hide, setHide] = useState<boolean>(true); // Use lowercase 'boolean'
+    const [StorageAccount, setStorageAccPubkey] = useState<Keypair | null>(
+        null
+    );
     const { connection } = useConnection();
     const { publicKey } = useWallet();
     const wallet = useAnchorWallet();
@@ -29,10 +31,7 @@ export const Calculator: React.FC = () => {
                     const lamports = accountInfo.lamports;
                     const solBalance = lamports / 1e9; // Convert lamports to SOL
                     setBalance(solBalance);
-                    setHide(false);
                 }
-            } else {
-                setHide(true);
             }
         };
 
@@ -41,7 +40,7 @@ export const Calculator: React.FC = () => {
 
     // Create a new counter
     const createCounter = async () => {
-        if (!publicKey) {
+        if (!publicKey || !wallet) {
             console.log("Wallet not connected!");
             return;
         }
@@ -49,34 +48,82 @@ export const Calculator: React.FC = () => {
         try {
             // Setting work environment to Dev chain
             const provider = getProvider(connection, wallet);
-            const baseAccount = web3.Keypair.generate();
+            const storageAcc = web3.Keypair.generate();
+            console.log(`Greeting Account ID: ${storageAcc.publicKey}`);
 
+            const a = JSON.stringify(idl);
+            const b = JSON.parse(a);
             // Create new data account or use existing one
-            const program = new Program(idl as any, idl.address, provider);
+            const program = new Program(b, idl.metadata.address, provider);
 
-            await program.rpc.initialize({
-                accounts: {
-                    myAccount: baseAccount.publicKey,
+            await program.methods
+                .initialize() // Setting initial data value explicitly
+                .accounts({
+                    my_account: storageAcc.publicKey,
                     user: provider.wallet.publicKey,
-                    systemProgram: SystemProgram.programId,
-                },
-                signers: [baseAccount],
-            });
+                    system_program: SystemProgram.programId,
+                })
+                .signers([storageAcc])
+                .rpc();
 
-            const account = await program.account.myAccount.fetch(baseAccount.publicKey);
+            console.log("requested successsfully");
+            setStorageAccPubkey(storageAcc);
+
+            const account = await program.account.my_account.fetch(
+                storageAcc.publicKey
+            );
             console.log(`Account: ${account}`);
         } catch (err) {
-            console.log("Transaction error: ", err);
+            console.error("Transaction error: ", err);
         }
     };
 
-    const increment = () => {
+    const increment = async () => {
         console.log("Increasing...");
-        setCount(1);
+        if (!publicKey || !wallet) {
+            console.log("Wallet not connected!");
+            return;
+        }
+        if (!StorageAccount) {
+            console.error(`Data Account not initialized`);
+            return;
+        }
+        try {
+            const provider = getProvider(connection, wallet);
+            const a = JSON.stringify(idl);
+            const b = JSON.parse(a);
+            // Create new data account or use existing one
+            const program = new Program(b, idl.metadata.address, provider);
+
+            // Fetch the account to increment
+
+            await program.methods
+                .increment()
+                .accounts({
+                    my_account: StorageAccount.publicKey,
+                })
+                .rpc();
+            
+            console.log("Incremented successfully");
+            const account = await program.account.my_account.fetch(
+                StorageAccount.publicKey
+            );
+            setCount(+1);
+            console.info(account);
+        } catch (err) {
+            console.error("Transaction error: ", err);
+        }
     };
 
     const decrement = () => {
         console.log("Decreasing...");
+        if (!publicKey || !wallet) {
+            console.log("Wallet not connected!");
+            return;
+        }
+        if (!StorageAccount) {
+            console.error(`Data Account not initialized`);
+        }
         setCount(-1);
     };
 
@@ -84,13 +131,15 @@ export const Calculator: React.FC = () => {
         <div className="Calculator">
             <h1>Solana Counter DAPP</h1>
 
-            {!hide && (
+            {publicKey != null && (
                 <div>
                     <h1>{`Wallet Balance: ${balance}`}</h1>
-                    <button onClick={createCounter}>Initialize</button>
-                    <button onClick={increment}>+</button>
                     <span>{count}</span>
-                    <button onClick={decrement}>-</button>
+                    <div className="butt">
+                        <button onClick={createCounter}>Initialize</button>
+                        <button onClick={increment}>+</button>
+                        <button onClick={decrement}>-</button>
+                    </div>
                 </div>
             )}
         </div>

@@ -6,8 +6,9 @@ import {
 import {
     WalletModalProvider,
     WalletMultiButton,
+    WalletDisconnectButton,
 } from "@solana/wallet-adapter-react-ui";
-import { UnsafeBurnerWalletAdapter } from "@solana/wallet-adapter-wallets";
+import { PhantomWalletAdapter } from "@solana/wallet-adapter-wallets";
 import { clusterApiUrl } from "@solana/web3.js";
 import React, { FC, ReactNode, useMemo } from "react";
 
@@ -23,6 +24,7 @@ export default function App() {
             <div className="App">
                 <Calculator />
                 <WalletMultiButton />
+                <WalletDisconnectButton/>
             </div>
         </Context>
     );
@@ -35,7 +37,9 @@ const Context: FC<{ children: ReactNode }> = ({ children }) => {
     // You can also provide a custom RPC endpoint.
     const endpoint = useMemo(() => clusterApiUrl(network), [network]);
 
-    const wallets = useMemo(() => [new UnsafeBurnerWalletAdapter()], []);
+    const wallets = useMemo(() => [
+        new PhantomWalletAdapter()
+    ], []);
 
     return (
         <ConnectionProvider endpoint={endpoint}>
