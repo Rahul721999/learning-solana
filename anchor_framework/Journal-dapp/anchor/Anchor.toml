@@ -12,8 +12,8 @@ Journaldapp = "AsjZ3kWAUSQRNt2pZVeJkywhZ6gpLpHZmJjduPmKZDZZ"
 url = "https://api.apr.dev"
 
 [provider]
-cluster = "Localnet"
-wallet = "~/.config/solana/id.json"
+cluster = "devnet"
+wallet = "~/wallet2.json"
 
 [scripts]
 test = "../node_modules/.bin/jest --preset ts-jest"
