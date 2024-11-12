@@ -5,8 +5,8 @@ anchor_version = "0.30.1"
 resolution = true
 skip-lint = false
 
-[programs.localnet]
-Journaldapp = "AsjZ3kWAUSQRNt2pZVeJkywhZ6gpLpHZmJjduPmKZDZZ"
+[programs.devnet]
+Journaldapp = "HpHawHV3Y4EpxakG3LsVP5Wfewcc9VBDWQxwzSXV9ZBy"
 
 [registry]
 url = "https://api.apr.dev"

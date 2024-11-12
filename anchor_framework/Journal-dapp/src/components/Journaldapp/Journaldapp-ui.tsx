@@ -1,22 +1,57 @@
 'use client'
 
-import { Keypair, PublicKey } from '@solana/web3.js'
+import { useState } from 'react'
+import { PublicKey } from '@solana/web3.js'
 import { useMemo } from 'react'
 import { ellipsify } from '../ui/ui-layout'
 import { ExplorerLink } from '../cluster/cluster-ui'
 import { useJournaldappProgram, useJournaldappProgramAccount } from './Journaldapp-data-access'
+import { useWallet } from '@solana/wallet-adapter-react'
 
 export function JournaldappCreate() {
-  const { initialize } = useJournaldappProgram()
+  const { createEntry } = useJournaldappProgram()
+  const { publicKey } = useWallet();
+  const [title, setTitle] = useState("");
+  const [message, setMessage] = useState("");
+
+  // form validation
+  const isFormValid = title.trim() != "" && message.trim() != "";
+
+  const handleSubmit = () => {
+    // check public key existance
+    if (publicKey && isFormValid) {
+      createEntry.mutateAsync({ title, message, owner: publicKey })
+    }
+  }
+
+  if (!publicKey) {
+    return <p>Connect Your Wallet</p>
+  }
 
   return (
-    <button
-      className="btn btn-xs lg:btn-md btn-primary"
-      onClick={() => initialize.mutateAsync(Keypair.generate())}
-      disabled={initialize.isPending}
-    >
-      Create {initialize.isPending && '...'}
-    </button>
+    <div>
+      <input
+        type="text"
+        placeholder='Title'
+        value={title}
+        onChange={e => setTitle(e.target.value)}
+        className='input input-bordered w-full max-w-xs'
+      />
+      <textarea
+        placeholder='message'
+        value={message}
+        onChange={e => setMessage(e.target.value)}
+        className='input input-bordered w-full max-w-xs'
+      />
+
+      <button
+        className="btn btn-xs lg:btn-md btn-primary"
+        onClick={handleSubmit}
+        disabled={createEntry.isPending || !isFormValid}
+      >
+        Create {createEntry.isPending && '...'}
+      </button>
+    </div>
   )
 }
 
@@ -54,11 +89,27 @@ export function JournaldappList() {
 }
 
 function JournaldappCard({ account }: { account: PublicKey }) {
-  const { accountQuery, incrementMutation, setMutation, decrementMutation, closeMutation } = useJournaldappProgramAccount({
-    account,
-  })
+  const { accountQuery,
+    updateEntry,
+    deleteEntry
+  } = useJournaldappProgramAccount({ account })
+  const { publicKey } = useWallet();
+  const [message, setMessage] = useState("");
 
-  const count = useMemo(() => accountQuery.data?.count ?? 0, [accountQuery.data?.count])
+  const title = accountQuery.data?.title;
+  // form validation
+  const isFormValid = message.trim() != "";
+
+  const handleSubmit = () => {
+    // check public key existance
+    if (publicKey && isFormValid && title) {
+      updateEntry.mutateAsync({ title, message, owner: publicKey })
+    }
+  }
+
+  if (!publicKey) {
+    return <p>Connect Your Wallet</p>
+  }
 
   return accountQuery.isLoading ? (
     <span className="loading loading-spinner loading-lg"></span>
@@ -67,35 +118,23 @@ function JournaldappCard({ account }: { account: PublicKey }) {
       <div className="card-body items-center text-center">
         <div className="space-y-6">
           <h2 className="card-title justify-center text-3xl cursor-pointer" onClick={() => accountQuery.refetch()}>
-            {count}
+            {accountQuery.data?.title}
           </h2>
+          <p>{accountQuery.data?.message}</p>
           <div className="card-actions justify-around">
+            <textarea
+              placeholder='New Message'
+              value={message}
+              onChange={e => setMessage(e.target.value)}
+              className='input input-bordered w-full max-w-xs'
+            />
+
             <button
-              className="btn btn-xs lg:btn-md btn-outline"
-              onClick={() => incrementMutation.mutateAsync()}
-              disabled={incrementMutation.isPending}
+              className="btn btn-xs lg:btn-md btn-primary"
+              onClick={handleSubmit}
+              disabled={updateEntry.isPending || !isFormValid}
             >
-              Increment
-            </button>
-            <button
-              className="btn btn-xs lg:btn-md btn-outline"
-              onClick={() => {
-                const value = window.prompt('Set value to:', count.toString() ?? '0')
-                if (!value || parseInt(value) === count || isNaN(parseInt(value))) {
-                  return
-                }
-                return setMutation.mutateAsync(parseInt(value))
-              }}
-              disabled={setMutation.isPending}
-            >
-              Set
-            </button>
-            <button
-              className="btn btn-xs lg:btn-md btn-outline"
-              onClick={() => decrementMutation.mutateAsync()}
-              disabled={decrementMutation.isPending}
-            >
-              Decrement
+              Update Entry {updateEntry.isPending && '...'}
             </button>
           </div>
           <div className="text-center space-y-4">
@@ -108,11 +147,14 @@ function JournaldappCard({ account }: { account: PublicKey }) {
                 if (!window.confirm('Are you sure you want to close this account?')) {
                   return
                 }
-                return closeMutation.mutateAsync()
-              }}
-              disabled={closeMutation.isPending}
+                const title = accountQuery.data?.title;
+                if (title){
+                  return deleteEntry.mutateAsync(title)
+                }
+              }}  
+              disabled={deleteEntry.isPending}
             >
-              Close
+              Delete
             </button>
           </div>
         </div>
