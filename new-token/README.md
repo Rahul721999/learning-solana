@@ -59,7 +59,7 @@ To add metadata to your token, such as its name, symbol, and URI, you'll need to
 1. **Install the Required Tools**
    Ensure you have the Solana CLI and the `metaplex` command-line tool installed. You can install the Metaplex tool with:
    ```bash
-   npm install -g @metaplex-foundation/cli
+   npm install -g @metaplex-foundation/mpl-token-metadata @metaplex-foundation/umi-bundle-defaults
    ```
 
 2. **Prepare Metadata**
