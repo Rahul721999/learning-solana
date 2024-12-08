@@ -1,5 +1,7 @@
 use anchor_lang::prelude::*;
-use anchor_spl::{token::Mint, token_interface::*};
+use anchor_spl::token_interface::{
+    transfer_checked, Mint, TokenAccount, TokenInterface, TransferChecked,
+};
 
 pub fn transfer_tokens<'info>(
     from: &InterfaceAccount<'info, TokenAccount>, // Sender Account
@@ -17,10 +19,7 @@ pub fn transfer_tokens<'info>(
     };
 
     // Cross Program Invokation...
-    let cpi_context = CpiContext::new(
-        token_program.to_account_info(),
-        transfer_accounts_options,
-    );
+    let cpi_context = CpiContext::new(token_program.to_account_info(), transfer_accounts_options);
 
     transfer_checked(cpi_context, *amount, mint.decimals)
 }
