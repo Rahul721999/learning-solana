@@ -8,7 +8,7 @@ mod error;
 // use error::ErrorCode;
 
 const ANCHOR_DISCRIMINATOR: usize = 8;
-declare_id!("coUnmi3oBUtwtd9fjeAvSsJssXh5A5xyPbhpewyzRVF");
+declare_id!("Hzk4Nt3cqA8XGfEZYCJrez5TcdMW8JiUwLtuAwYwmPma");
 
 #[program]
 pub mod tokenvesting {
