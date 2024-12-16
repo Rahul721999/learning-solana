@@ -16,7 +16,7 @@ pub mod tokenvesting {
 
     use super::*;
 
-    pub fn create_employee_vesting(
+    pub fn create_vesting_account(
         ctx: Context<CreateVestingAccount>,
         company_name: String,
     ) -> Result<()> {
