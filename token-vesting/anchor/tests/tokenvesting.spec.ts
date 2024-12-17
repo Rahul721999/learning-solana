@@ -1,11 +1,12 @@
 import * as anchor from '@coral-xyz/anchor'
-import { Program } from '@coral-xyz/anchor'
+import { Program, BN } from '@coral-xyz/anchor'
 import { Keypair, PublicKey } from '@solana/web3.js'
 import { Tokenvesting } from '../target/types/tokenvesting'
 import {
     startAnchor,
     ProgramTestContext,
-    BanksClient
+    BanksClient,
+    Clock
 } from "solana-bankrun";
 
 import IDL from "../target/idl/tokenvesting.json"
@@ -80,8 +81,9 @@ describe('Vesting Smart Contract Tests', () => {
         /* -------------- Derive Program-Derived Addresses (PDAs) -------------- */
 
         // PDA for vesting account (holds metadata for a company's vesting schedule)
+        const companySeed = Buffer.from(company_name.slice(0, 32));
         [vestingAccountKey] = PublicKey.findProgramAddressSync(
-            [Buffer.from(company_name)], // Seed: company name
+            [Buffer.from(companySeed)], // Seed: company name
             program.programId
         );
 
@@ -100,6 +102,8 @@ describe('Vesting Smart Contract Tests', () => {
             ],
             program.programId
         );
+
+        console.log("Derived Employee Account PDA: ", employeeAccount.toBase58());
     });
 
 
@@ -113,21 +117,74 @@ describe('Vesting Smart Contract Tests', () => {
                 tokenMint: mint, // Token mint used for vesting tokens
             })
             .rpc({ commitment: "confirmed" }); // Wait for transaction confirmation
-    
+
         // Fetch the data of the newly created vesting account
         const vestingAccountData = await program.account.vestingAccount.fetch(
             vestingAccountKey, // PDA of the vesting account
             "confirmed" // Fetch with confirmed commitment
         );
-    
+
         // Log the fetched vesting account data for debugging or verification
         console.log(
             "Vesting Account Data: ",
             JSON.stringify(vestingAccountData, null, 2)
         );
-    
+
         // Log the transaction signature for reference
         console.log("Create Vesting Account Transaction Signature: ", tx);
     });
-    
+
+    it("TEST: should fund the treasury token account", async () => {
+        // transaction to fund threasury token account
+        const amount = 10_000 * 10 ** 9;
+        const mintTx = await mintTo(
+            // @ts-ignores
+            banksClient,
+            employer,
+            mint,
+            treasuryTokenAccount,
+            employer,
+            amount
+        );
+        console.log("Mint to treasury transaction signature: ", mintTx);
+    });
+
+    it("TEST: Create an Employee Account", async () => {
+        const tx = await program.methods
+            .createEmployeeVesting(new BN(0), new BN(100), new BN(0), new BN(100))
+            .accounts({
+                beneficiary: beneficiary.publicKey,
+                vestingAccount: vestingAccountKey
+            })
+            .rpc({ commitment: "confirmed", skipPreflight: true });
+
+        console.log("Create employee account transaction signature: ", tx);
+        console.log("Employee Account: ", employeeAccount.toBase58());
+    });
+
+    it("TEST: Claims token", async () => {
+        await new Promise((resolve) => setTimeout(resolve, 1000));
+
+        const currClock = await banksClient.getClock();
+        context.setClock(
+            new Clock(
+                currClock.slot,
+                currClock.epochStartTimestamp,
+                currClock.epoch,
+                currClock.leaderScheduleEpoch,
+                1000n
+            )
+        );
+        console.log("Employee Account: ", employeeAccount.toBase58());
+
+        const tx = await program2.methods
+            .claimTokens(company_name)
+            .accounts({
+                tokenProgram: TOKEN_PROGRAM_ID
+            })
+            .rpc({ commitment: "confirmed" });
+
+        console.log("Claim tokens transaction signature: ", tx);
+        
+    });
 }) 

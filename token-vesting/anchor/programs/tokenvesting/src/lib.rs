@@ -31,7 +31,7 @@ pub mod tokenvesting {
         Ok(())
     }
 
-    pub fn create_employee_account(
+    pub fn create_employee_vesting(
         ctx: Context<CreateEmployeeAccount>,
         start_time: i64,
         end_time: i64,
