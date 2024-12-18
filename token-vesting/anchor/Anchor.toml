@@ -12,7 +12,7 @@ tokenvesting = "Hzk4Nt3cqA8XGfEZYCJrez5TcdMW8JiUwLtuAwYwmPma"
 url = "https://api.apr.dev"
 
 [provider]
-cluster = "Localnet"
+cluster = "devnet"
 wallet = "~/.config/solana/id.json"
 
 [scripts]
