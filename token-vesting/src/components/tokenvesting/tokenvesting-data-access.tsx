@@ -105,5 +105,6 @@ export function userVestingProgramAccount({ account }: { account: PublicKey }) {
 
   return {
     accountQuery,
+    createEmployeeVestingAccount
   }
 }
