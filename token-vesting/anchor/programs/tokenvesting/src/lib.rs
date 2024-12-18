@@ -100,7 +100,7 @@ pub mod tokenvesting {
         let cpi_program = ctx.accounts.token_program.to_account_info();
 
         let signer_seeds: &[&[&[u8]]] = &[&[
-            b"vesting_tresury",
+            b"vesting_treasury",
             ctx.accounts.vesting_account.company_name.as_ref(),
             &[ctx.accounts.vesting_account.treasury_bump],
         ]];
