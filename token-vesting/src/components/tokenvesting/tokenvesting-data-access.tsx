@@ -2,7 +2,7 @@
 
 import { getTokenvestingProgram, getTokenvestingProgramId } from '@project/anchor'
 import { useConnection } from '@solana/wallet-adapter-react'
-import { Cluster, Keypair, PublicKey } from '@solana/web3.js'
+import { Cluster, PublicKey } from '@solana/web3.js'
 import { useMutation, useQuery } from '@tanstack/react-query'
 import { useMemo } from 'react'
 import toast from 'react-hot-toast'
@@ -11,7 +11,6 @@ import { useAnchorProvider } from '../solana/solana-provider'
 import { useTransactionToast } from '../ui/ui-layout'
 import { TOKEN_PROGRAM_ID } from '@solana/spl-token'
 import BN from "bn.js";
-import { publicKey } from '@coral-xyz/anchor/dist/cjs/utils'
 
 interface CreateVestingArgs {
   companyName: string,
@@ -66,7 +65,7 @@ export function useTokenvestingProgram() {
     programId,
     accounts,
     getProgramAccount,
-    initialize: createVestingAccount,
+    createVestingAccount,
   }
 }
 
