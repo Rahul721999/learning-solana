@@ -5,7 +5,7 @@ import { WalletButton } from '../solana/solana-provider'
 import { AppHero, ellipsify } from '../ui/ui-layout'
 import { ExplorerLink } from '../cluster/cluster-ui'
 import { useTokenvestingProgram } from './tokenvesting-data-access'
-import { TokenvestingCreate, TokenvestingList } from './tokenvesting-ui'
+import { TokenvestingCreate, TokenvestingList, ClaimTokens } from './tokenvesting-ui'
 
 export default function TokenvestingFeature() {
   const { publicKey } = useWallet()
@@ -23,6 +23,7 @@ export default function TokenvestingFeature() {
           <ExplorerLink path={`account/${programId}`} label={ellipsify(programId.toString())} />
         </p>
         <TokenvestingCreate />
+        <ClaimTokens />
       </AppHero>
       <TokenvestingList />
     </div>
