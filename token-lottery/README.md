@@ -19,7 +19,7 @@ The Token Lottery DApp is a decentralized application built on the Solana blockc
     - The total prize pool is transferred to the winner.
 ---
 ## Instructions
-- `Initialize_comfig` : used to setup the configuration for the Lottery system. Like: `startTime`, `endTime`, `prizeAmount` etc.
+- `Initialize_config` : used to setup the configuration for the Lottery system. Like: `startTime`, `endTime`, `prizeAmount` etc.
 - `Intialize_lottery` : Starts a lottery round.
 - `Buy_ticket` : Allows users to buy tickets.
 - `Commit_a_winner` : Commits the winner in specific round(used in randomness process).
