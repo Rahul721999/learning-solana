@@ -1,76 +1,55 @@
 import * as anchor from '@coral-xyz/anchor'
-import {Program} from '@coral-xyz/anchor'
-import {Keypair} from '@solana/web3.js'
-import {Tokenlottery} from '../target/types/tokenlottery'
+import { Program } from '@coral-xyz/anchor'
+import { Keypair, PublicKey } from '@solana/web3.js'
+import { Tokenlottery } from '../target/types/tokenlottery'
+import { startAnchor, ProgramTestContext } from 'solana-bankrun';
+import { BankrunProvider } from 'anchor-bankrun';
+import IDL from '../target/idl/tokenlottery.json';
+
+const PROGRAM_ID = new PublicKey(IDL.address)
+
 
 describe('tokenlottery', () => {
-  // Configure the client to use the local cluster.
-  const provider = anchor.AnchorProvider.env()
-  anchor.setProvider(provider)
-  const payer = provider.wallet as anchor.Wallet
+  let context: ProgramTestContext;
+  let provider: BankrunProvider;
+  let program: Program<Tokenlottery>;
+  let payer: Keypair;
+  let tokenLotteryAccount: Keypair;
 
-  const program = anchor.workspace.Tokenlottery as Program<Tokenlottery>
 
-  const tokenlotteryKeypair = Keypair.generate()
+  beforeAll(async () => {
+
+    // set context for anchor-bankrun
+    context = await startAnchor(
+      "",
+      [{ name: "tokenlottery", programId: PROGRAM_ID }],
+      []
+    );
+
+    // set provider
+    provider = new BankrunProvider(context);
+    anchor.setProvider(provider);
+
+    program = new Program<Tokenlottery>(IDL as Tokenlottery, provider);
+
+    payer = provider.wallet.payer;
+
+    tokenLotteryAccount = Keypair.generate();
+  });
 
   it('Initialize Tokenlottery', async () => {
-    await program.methods
-      .initialize()
+    const tx = await program.methods
+      .initializeConfig(
+        new anchor.BN(1735143320),  // start Time
+        new anchor.BN(1835143320),  // end Time
+        new anchor.BN(1000),        // Ticket Price
+        new anchor.BN(10000),       // Jackpot
+      )
       .accounts({
-        tokenlottery: tokenlotteryKeypair.publicKey,
-        payer: payer.publicKey,
+        payer: payer.publicKey
       })
-      .signers([tokenlotteryKeypair])
-      .rpc()
+      .rpc({ commitment: "confirmed" })
 
-    const currentCount = await program.account.tokenlottery.fetch(tokenlotteryKeypair.publicKey)
-
-    expect(currentCount.count).toEqual(0)
-  })
-
-  it('Increment Tokenlottery', async () => {
-    await program.methods.increment().accounts({ tokenlottery: tokenlotteryKeypair.publicKey }).rpc()
-
-    const currentCount = await program.account.tokenlottery.fetch(tokenlotteryKeypair.publicKey)
-
-    expect(currentCount.count).toEqual(1)
-  })
-
-  it('Increment Tokenlottery Again', async () => {
-    await program.methods.increment().accounts({ tokenlottery: tokenlotteryKeypair.publicKey }).rpc()
-
-    const currentCount = await program.account.tokenlottery.fetch(tokenlotteryKeypair.publicKey)
-
-    expect(currentCount.count).toEqual(2)
-  })
-
-  it('Decrement Tokenlottery', async () => {
-    await program.methods.decrement().accounts({ tokenlottery: tokenlotteryKeypair.publicKey }).rpc()
-
-    const currentCount = await program.account.tokenlottery.fetch(tokenlotteryKeypair.publicKey)
-
-    expect(currentCount.count).toEqual(1)
-  })
-
-  it('Set tokenlottery value', async () => {
-    await program.methods.set(42).accounts({ tokenlottery: tokenlotteryKeypair.publicKey }).rpc()
-
-    const currentCount = await program.account.tokenlottery.fetch(tokenlotteryKeypair.publicKey)
-
-    expect(currentCount.count).toEqual(42)
-  })
-
-  it('Set close the tokenlottery account', async () => {
-    await program.methods
-      .close()
-      .accounts({
-        payer: payer.publicKey,
-        tokenlottery: tokenlotteryKeypair.publicKey,
-      })
-      .rpc()
-
-    // The account should no longer exist, returning null.
-    const userAccount = await program.account.tokenlottery.fetchNullable(tokenlotteryKeypair.publicKey)
-    expect(userAccount).toBeNull()
+    console.log("Create Token Lottery Transaction  Signature: ", tx);
   })
 })

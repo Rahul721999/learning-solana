@@ -1,4 +1,4 @@
-#![allow(clippy::result_large_err, unused_imports)]
+#![allow(unexpected_cfgs, unused_imports)]
 
 use anchor_lang::prelude::*;
 use anchor_lang::system_program;
