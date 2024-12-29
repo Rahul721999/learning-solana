@@ -50,7 +50,7 @@ pub fn initialize_lottery(ctx: Context<InitializeLottery>) -> Result<()> {
     msg!("Creating metadata account...");
     create_metadata_accounts_v3(
         CpiContext::new_with_signer(
-            ctx.accounts.token_program.to_account_info(),
+            ctx.accounts.token_metadata_program.to_account_info(),
             CreateMetadataAccountsV3{
                 metadata: ctx.accounts.metadata.to_account_info(),
                 mint: ctx.accounts.collection_mint.to_account_info(),
