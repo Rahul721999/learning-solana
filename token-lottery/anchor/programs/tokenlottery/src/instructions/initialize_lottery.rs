@@ -124,48 +124,29 @@ pub struct InitializeLottery<'info>{
         init, 
         payer = payer, 
         mint::decimals = 0,
-        mint::authority = payer,
-        mint::freeze_authority = payer,
+        mint::authority = collection_mint,
+        mint::freeze_authority = collection_mint,
         seeds = [b"collection_mint".as_ref()],
         bump,
     )]
     pub collection_mint: InterfaceAccount<'info, Mint>,
 
     #[account(
-        init,
+        init_if_needed,
         payer = payer,
-        token::mint = collection_mint,
-        token::authority = collection_token_account,
         seeds = [b"collection_associated_token".as_ref()],
-        bump
+        bump,
+        token::mint = collection_mint,
+        token::authority = collection_token_account
     )]
     pub collection_token_account: InterfaceAccount<'info, TokenAccount>,
 
-    #[account(
-        mut,
-        seeds = [
-            b"metadata", 
-            token_metadata_program.key().as_ref(), 
-            collection_mint.key().as_ref()
-        ],
-        bump,
-        seeds::program = token_metadata_program.key(),
-    )]
-    /// CHECK: This account is checked by the metadata smart contract
+    #[account(mut)]
+    /// CHECK: This account is initialized by metaplex program
     pub metadata: UncheckedAccount<'info>,
 
-    #[account(
-        mut,
-        seeds = [
-            b"metadata", 
-            token_metadata_program.key().as_ref(), 
-            collection_mint.key().as_ref(),
-            b"edition",
-        ],
-        bump,
-        seeds::program = token_metadata_program.key(),
-    )]
-    /// CHECK: This account is checked by the metadata smart contract
+    #[account(mut)]
+    /// CHECK: This account is initialized by metaplex program
     pub master_editions: UncheckedAccount<'info>,
 
     pub token_metadata_program: Program<'info, Metadata>,
