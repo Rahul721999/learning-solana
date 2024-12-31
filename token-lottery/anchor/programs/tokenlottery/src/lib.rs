@@ -27,7 +27,7 @@ use anchor_spl::metadata::{
         },
 };
 
-declare_id!("8BwyWuqMWnNay4a2d2FKX93vKA9YZjK4ddHDcYZRACAn");
+declare_id!("5m1SMwjzymVG7MSX4DEvu9v354StReHGvxJL6oPDWsXo");
 
 
 #[constant]
