@@ -35,7 +35,7 @@ pub const NAME: &str = "Token Lottery Ticket #";
 #[constant]
 pub const SYMBOL: &str = "TLT";
 #[constant]
-pub const URI: &str = "https://www.shutterstock.com/search/vintage-concert-ticket?image_type=vector";
+pub const URI: &str = "https://github.com/Rahul721999/learning-solana/blob/main/token-lottery/anchor/metadata.json";
 
 const ANCHOR_DISCRIMINATOR: usize = 8;
 
