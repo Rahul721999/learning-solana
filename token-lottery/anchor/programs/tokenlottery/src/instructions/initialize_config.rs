@@ -20,7 +20,6 @@ pub fn initialize_config(
     start_time: u64,
     end_time: u64,
     ticket_price: u64,
-    prize_amount: u64,
 ) -> Result<()> {
     *ctx.accounts.token_lottery_account = TokenLotteryAccount {
         bump: ctx.bumps.token_lottery_account,
@@ -28,7 +27,7 @@ pub fn initialize_config(
         winner_claimed: false,
         start_time,
         end_time,
-        prize_amount,
+        lottery_pot_amount: 0,
         ticket_price,
         ticket_num: 0,
         winner_commitment: 0,
@@ -42,7 +41,7 @@ pub fn initialize_config(
 
 /* ----------------------------Initialize Lottery Config---------------------------- */
 #[derive(Accounts)]
-#[instruction(start_time: u64, end_time: u64, prize_amount: u64, ticket_price: u64)]
+#[instruction(start_time: u64, end_time: u64,  ticket_price: u64)]
 pub struct InitializeLotteryConfig<'info> {
     #[account(mut)]
     pub payer: Signer<'info>,
@@ -65,7 +64,7 @@ pub struct TokenLotteryAccount {
     pub winner_claimed: bool,
     pub start_time: u64,
     pub end_time: u64,
-    pub prize_amount: u64,
+    pub lottery_pot_amount: u64,
     pub ticket_price: u64,
     pub ticket_num: u64,
     pub winner_commitment: u64,

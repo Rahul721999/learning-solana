@@ -52,10 +52,9 @@ pub mod tokenlottery {
         ctx: Context<InitializeLotteryConfig>,
         start_time: u64,
         end_time: u64,
-        ticket_price: u64,
-        prize_amount: u64,
+        ticket_price: u64
     ) -> Result<()> {
-        instructions::initialize_config(ctx, start_time, end_time, ticket_price, prize_amount)
+        instructions::initialize_config(ctx, start_time, end_time, ticket_price)
     }
 
     // Responsible for initializing the mint collection, metadata, master edition and associated token account.

@@ -52,7 +52,7 @@ pub struct BuyTicket<'info> {
     pub ticket_mint: InterfaceAccount<'info, Mint>, // individual mint for each ticket
 
     #[account(
-        init_if_needed,
+        init,
         payer = buyer,
         associated_token::mint = ticket_mint,
         associated_token::authority = buyer,
@@ -132,6 +132,7 @@ pub fn buy_ticket(ctx: Context<BuyTicket>) -> Result<()> {
     let clock = Clock::get()?;
     let ticket_name = NAME.to_string() + &ctx.accounts.token_lottery.ticket_num.to_string();
 
+    msg!("Curr Slot: {}, start: {}, end: {}", clock.slot, ctx.accounts.token_lottery.start_time, ctx.accounts.token_lottery.end_time);
     if clock.slot < ctx.accounts.token_lottery.start_time ||
         clock.slot > ctx.accounts.token_lottery.end_time{
             return Err(ErrorCode::LotteryNotOpen.into());
@@ -149,6 +150,8 @@ pub fn buy_ticket(ctx: Context<BuyTicket>) -> Result<()> {
         ctx.accounts.token_lottery.ticket_price,
     )?;
 
+    ctx.accounts.token_lottery.lottery_pot_amount += ctx.accounts.token_lottery.ticket_price;
+
     // create ticket
     let signer_seeds : &[&[&[u8]]] = &[&[
         b"collection_mint".as_ref(),
@@ -163,7 +166,7 @@ pub fn buy_ticket(ctx: Context<BuyTicket>) -> Result<()> {
                 to: ctx.accounts.buyer_token_account.to_account_info(),
                 authority: ctx.accounts.collection_mint.to_account_info(),
             },
-            &signer_seeds
+            signer_seeds
         ),
         1
     )?;
@@ -174,7 +177,7 @@ pub fn buy_ticket(ctx: Context<BuyTicket>) -> Result<()> {
             ctx.accounts.token_metadata_program.to_account_info(),
             CreateMetadataAccountsV3{
                 metadata: ctx.accounts.ticket_metadata.to_account_info(),
-                mint: ctx.accounts.collection_mint.to_account_info(),
+                mint: ctx.accounts.ticket_mint.to_account_info(),
                 mint_authority: ctx.accounts.collection_mint.to_account_info(),
                 update_authority: ctx.accounts.collection_mint.to_account_info(),
                 payer: ctx.accounts.buyer.to_account_info(),
@@ -204,10 +207,10 @@ pub fn buy_ticket(ctx: Context<BuyTicket>) -> Result<()> {
     msg!("Creating master edition account...");
     create_master_edition_v3(
         CpiContext::new_with_signer(
-            ctx.accounts.token_program.to_account_info(), 
+            ctx.accounts.token_metadata_program.to_account_info(), 
             CreateMasterEditionV3{
                 payer:ctx.accounts.buyer.to_account_info(),
-                mint:ctx.accounts.collection_mint.to_account_info(),
+                mint:ctx.accounts.ticket_mint.to_account_info(),
                 edition:ctx.accounts.ticket_master_editions.to_account_info(),
                 mint_authority:ctx.accounts.collection_mint.to_account_info(),
                 update_authority:ctx.accounts.collection_mint.to_account_info(),
