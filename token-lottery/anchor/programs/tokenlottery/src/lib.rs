@@ -2,6 +2,10 @@
 mod instructions;
 use instructions::*;
 
+mod errors;
+use errors::*;
+
+
 use anchor_lang::prelude::*;
 use anchor_lang::system_program;
 use anchor_spl::{
@@ -60,9 +64,9 @@ pub mod tokenlottery {
     }
 
 
-    // pub fn buy_ticket(_ctx: Context<InitializeTokenlottery>) -> Result<()> {
-    //     Ok(())
-    // }
+    pub fn buy_ticket(ctx: Context<BuyTicket>) -> Result<()> {
+        instructions::buy_ticket(ctx)
+    }
     // pub fn commit_a_winner(_ctx: Context<InitializeTokenlottery>) -> Result<()> {
     //     Ok(())
     // }
