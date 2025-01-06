@@ -6,3 +6,6 @@ pub use initialize_lottery::*;
 
 pub mod buy_ticket;
 pub use buy_ticket::*;
+
+pub mod commit_winner;
+pub use commit_winner::*;
