@@ -1,18 +1,15 @@
-use anchor_lang::{accounts::signer, prelude::*};
+use anchor_lang::prelude::*;
 use anchor_spl::{
     associated_token::AssociatedToken,
     token_interface::{Mint,MintTo, mint_to, TokenInterface, TokenAccount},
 };
 use anchor_spl::metadata::{
     Metadata,
-    MetadataAccount,
     CreateMetadataAccountsV3,
     CreateMasterEditionV3,
-    SignMetadata,
     SetAndVerifySizedCollectionItem,
     create_master_edition_v3,
     create_metadata_accounts_v3,
-    sign_metadata,
     set_and_verify_sized_collection_item,
     mpl_token_metadata::types::{
             CollectionDetails,
