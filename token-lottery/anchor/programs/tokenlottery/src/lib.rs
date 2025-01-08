@@ -41,9 +41,10 @@ pub mod tokenlottery {
     pub fn commit_a_winner(ctx: Context<CommitWinner>) -> Result<()> {
         instructions::commit_winner(ctx)
     }
-    // pub fn choose_a_winner(_ctx: Context<InitializeTokenlottery>) -> Result<()> {
-    //     Ok(())
-    // }
+    
+    pub fn choose_a_winner(ctx: Context<ChooseWinner>) -> Result<()> {
+        instructions::choose_winner(ctx)
+    }
     // pub fn claim_prize(_ctx: Context<InitializeTokenlottery>) -> Result<()> {
     //     Ok(())
     // }

@@ -9,3 +9,6 @@ pub use buy_ticket::*;
 
 pub mod commit_winner;
 pub use commit_winner::*;
+
+pub mod choose_winner;
+pub use choose_winner::*;
