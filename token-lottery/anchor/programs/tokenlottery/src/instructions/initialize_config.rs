@@ -1,6 +1,5 @@
 use crate::*;
 use anchor_lang::prelude::*;
-use rand::Rng;
 
 // Invoked by the lottery creator to initialize the lottery (startTime, endTime etc.).
 pub fn initialize_config(
@@ -9,7 +8,6 @@ pub fn initialize_config(
     end_time: u64,
     ticket_price: u64,
 ) -> Result<()> {
-    let mut rng = rand::thread_rng();
     *ctx.accounts.token_lottery_account = TokenLotteryAccount {
         bump: ctx.bumps.token_lottery_account,
         winner: 0,
@@ -18,7 +16,7 @@ pub fn initialize_config(
         end_time,
         lottery_pot_amount: 0,
         ticket_price,
-        ticket_num: rng.gen::<u64>(),
+        ticket_num: 0,
         winner_commitment: 0,
         winner_committed: false,
         winner_chosen: false,
