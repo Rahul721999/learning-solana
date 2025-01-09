@@ -45,7 +45,8 @@ pub mod tokenlottery {
     pub fn choose_a_winner(ctx: Context<ChooseWinner>) -> Result<()> {
         instructions::choose_winner(ctx)
     }
-    // pub fn claim_prize(_ctx: Context<InitializeTokenlottery>) -> Result<()> {
-    //     Ok(())
-    // }
+    
+    pub fn claim_prize(ctx: Context<ClaimPrize>) -> Result<()> {
+        instructions::claim_prize(ctx)
+    }
 }

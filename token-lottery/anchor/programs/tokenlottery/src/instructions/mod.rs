@@ -12,3 +12,6 @@ pub use commit_winner::*;
 
 pub mod choose_winner;
 pub use choose_winner::*;
+
+pub mod claim_prize;
+pub use claim_prize::*;
