@@ -2,6 +2,7 @@ use anchor_lang::prelude::*;
 use anchor_spl::{
     metadata::{Metadata, MetadataAccount}, 
     token_interface::{Mint, TokenInterface, TokenAccount}};
+use solana_program::{program::invoke, system_instruction};
 use crate::{errors::ErrorCode, TokenLotteryAccount, NAME};
 
 #[derive(Accounts)]
@@ -48,17 +49,6 @@ pub struct ClaimPrize<'info>{
     )]
     pub winner_ticket_account: InterfaceAccount<'info, TokenAccount>,
 
-    #[account(
-        seeds=[
-            b"metadata".as_ref(),
-            token_metadata_program.key().as_ref(),
-            collection_mint.key().as_ref()
-        ],
-        bump,
-        seeds::program = token_metadata_program.key(),
-    )]
-    pub collection_metadata: Account<'info, MetadataAccount>,
-
     pub system_program: Program<'info, System>,
     pub token_program: Interface<'info, TokenInterface>,
     pub token_metadata_program: Program<'info, Metadata>
@@ -73,15 +63,16 @@ pub fn claim_prize(ctx: Context<ClaimPrize>) -> Result<()>{
     msg!("Winner Chosen: {}", token_lottery.winner);
 
     // check if the token belongs to collection
-    require!(ctx.accounts.ticket_metadata.collection.as_ref().unwrap().verified, ErrorCode::NotVerifiedTicket);
+    let collection = ctx.accounts.ticket_metadata.collection.as_ref().ok_or(ErrorCode::NotVerifiedTicket)?;
+    require!(collection.verified, ErrorCode::NotVerifiedTicket);
     require!(
-        ctx.accounts.ticket_metadata.collection.as_ref().unwrap().key == ctx.accounts.collection_mint.key(), 
+        collection.key == ctx.accounts.collection_mint.key(), 
         ErrorCode::IncorrectTicket
     );
 
     // check ticket name matches the metadata name
-    let ticket_name = NAME.to_owned() + &ctx.accounts.token_lottery_account.winner.to_string();
-    let metadata_name = ctx.accounts.ticket_metadata.name.replace("\u{0}", "");
+    let ticket_name = format!("{}{}", NAME, ctx.accounts.token_lottery_account.winner);
+    let metadata_name = ctx.accounts.ticket_metadata.name.trim_end_matches(char::from(0));
 
     msg!("Ticket name: {}", ticket_name);
     msg!("Metadata name: {}", metadata_name);
@@ -94,8 +85,17 @@ pub fn claim_prize(ctx: Context<ClaimPrize>) -> Result<()>{
     // if everything is correct, transfer the pot amount to winner token account
     let jackpot_amount = ctx.accounts.token_lottery_account.lottery_pot_amount;
     
-    **ctx.accounts.token_lottery_account.to_account_info().try_borrow_mut_lamports()? -= jackpot_amount;
-    **ctx.accounts.payer.try_borrow_mut_lamports()? += jackpot_amount;
+    invoke(
+        &system_instruction::transfer(
+            ctx.accounts.token_lottery_account.to_account_info().key,
+            ctx.accounts.payer.to_account_info().key,
+            jackpot_amount,
+        ),
+        &[
+            ctx.accounts.token_lottery_account.to_account_info(),
+            ctx.accounts.payer.to_account_info(),
+        ],
+    )?;
 
     // empty the lottery pot
     ctx.accounts.token_lottery_account.lottery_pot_amount = 0;
