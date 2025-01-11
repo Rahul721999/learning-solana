@@ -256,8 +256,29 @@ describe('tokenlottery', () => {
       tokenLotteryAccountPDA
     );
 
+    expect(tokenLotteryAcc.bump).toBe(tokenAccountBump);
     expect(tokenLotteryAcc.winnerChosen).toBe(true);
     expect(Number(tokenLotteryAcc.winner)).toBeGreaterThan(0);
     expect(tokenLotteryAcc.winnerClaimed).toBe(false);
-  })
+  });
+
+  it("Is claiming a prize", async () => {
+    const claimIx = await program.methods.claimPrize()
+      .accounts({
+        tokenProgram: TOKEN_PROGRAM_ID,
+      })
+      .instruction();
+    
+      const claimBlockhashContext = await connection.getLatestBlockhash();
+      
+      const claimTx = new anchor.web3.Transaction({
+        blockhash: claimBlockhashContext.blockhash,
+        lastValidBlockHeight: claimBlockhashContext.lastValidBlockHeight,
+        feePayer: wallet.publicKey,
+      }).add(claimIx);
+
+      const claimSignature = await anchor.web3.sendAndConfirmTransaction(connection, claimTx, [wallet.payer], { skipPreflight: true });
+      console.log("Claim token signature: ", claimSignature);
+  });
 })
+ 

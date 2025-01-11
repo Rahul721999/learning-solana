@@ -2,7 +2,7 @@ use anchor_lang::prelude::*;
 use anchor_spl::{
     metadata::{Metadata, MetadataAccount}, 
     token_interface::{Mint, TokenInterface, TokenAccount}};
-use solana_program::{program::invoke, system_instruction};
+    // use solana_program::{program::invoke_signed, system_instruction};
 use crate::{errors::ErrorCode, TokenLotteryAccount, NAME};
 
 #[derive(Accounts)]
@@ -31,7 +31,6 @@ pub struct ClaimPrize<'info>{
     pub ticket_mint: InterfaceAccount<'info, Mint>,
 
     #[account(
-        mut,
         seeds=[
             b"metadata", 
             token_metadata_program.key().as_ref(), 
@@ -42,6 +41,14 @@ pub struct ClaimPrize<'info>{
     )]
     pub ticket_metadata: Account<'info, MetadataAccount>, 
 
+    #[account(
+        mut,
+        seeds = [b"metadata", token_metadata_program.key().as_ref(), collection_mint.key().as_ref()],
+        bump,
+        seeds::program = token_metadata_program.key(),
+    )]
+    pub collection_metadata: Account<'info, MetadataAccount>,
+    
     #[account(
         associated_token::mint = ticket_mint,
         associated_token::authority = payer,
@@ -71,7 +78,7 @@ pub fn claim_prize(ctx: Context<ClaimPrize>) -> Result<()>{
     );
 
     // check ticket name matches the metadata name
-    let ticket_name = format!("{}{}", NAME, ctx.accounts.token_lottery_account.winner);
+    let ticket_name = format!("{}{}", NAME, token_lottery.winner);
     let metadata_name = ctx.accounts.ticket_metadata.name.trim_end_matches(char::from(0));
 
     msg!("Ticket name: {}", ticket_name);
@@ -83,19 +90,10 @@ pub fn claim_prize(ctx: Context<ClaimPrize>) -> Result<()>{
     require!(ctx.accounts.winner_ticket_account.amount > 0, ErrorCode::IncorrectTicket);
 
     // if everything is correct, transfer the pot amount to winner token account
-    let jackpot_amount = ctx.accounts.token_lottery_account.lottery_pot_amount;
+    let jackpot_amount = token_lottery.lottery_pot_amount;
     
-    invoke(
-        &system_instruction::transfer(
-            ctx.accounts.token_lottery_account.to_account_info().key,
-            ctx.accounts.payer.to_account_info().key,
-            jackpot_amount,
-        ),
-        &[
-            ctx.accounts.token_lottery_account.to_account_info(),
-            ctx.accounts.payer.to_account_info(),
-        ],
-    )?;
+    **token_lottery.to_account_info().try_borrow_mut_lamports()? -= jackpot_amount;
+    **ctx.accounts.payer.try_borrow_mut_lamports()? += jackpot_amount;
 
     // empty the lottery pot
     ctx.accounts.token_lottery_account.lottery_pot_amount = 0;
