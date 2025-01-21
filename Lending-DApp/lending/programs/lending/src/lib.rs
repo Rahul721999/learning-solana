@@ -1,3 +1,6 @@
+// mod instruction;
+// use instruction::*;
+
 use anchor_lang::prelude::*;
 
 declare_id!("GHeNTmRLi6cM8mxrgz5jhys5kwnVPJEUNp19ykyWofqP");
@@ -6,11 +9,18 @@ declare_id!("GHeNTmRLi6cM8mxrgz5jhys5kwnVPJEUNp19ykyWofqP");
 pub mod lending {
     use super::*;
 
-    pub fn initialize(ctx: Context<Initialize>) -> Result<()> {
-        msg!("Greetings from: {:?}", ctx.program_id);
-        Ok(())
-    }
+    // initialize bank account
+
+    // initialize_user account
+
+    // deposite token
+
+    // withdraw token
+
+    // borrow Loan
+
+    // repay Loan
+
+    // liquidate
 }
 
-#[derive(Accounts)]
-pub struct Initialize {}
