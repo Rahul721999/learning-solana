@@ -11,7 +11,7 @@ declare_id!("GHeNTmRLi6cM8mxrgz5jhys5kwnVPJEUNp19ykyWofqP");
 pub mod lending {
     use super::*;
 
-    // initialize bank account
+    /// initialize bank account
     pub fn initialize_bank(
         ctx: Context<InitBank>,
         liquidation_threshold: u64,
@@ -20,7 +20,10 @@ pub mod lending {
         process_initialize_bank(ctx, liquidation_threshold, max_ltv)
     }
 
-    // initialize_user account
+    /// initialize_user account
+    pub fn initialize_user(ctx: Context<InitUser>, usdc_bank_account: Pubkey) -> Result<()>{
+        process_initialize_user(ctx, usdc_bank_account)
+    }
 
     // deposite token
 

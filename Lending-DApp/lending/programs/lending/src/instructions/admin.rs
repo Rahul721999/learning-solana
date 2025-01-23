@@ -42,3 +42,31 @@ pub fn process_initialize_bank(
     bank.max_ltv = max_ltv;
     Ok(())
 }
+
+
+#[derive(Accounts)]
+pub struct InitUser<'info>{
+    #[account(mut)]
+    pub signer: Signer<'info>,
+
+    #[account(
+        init,
+        payer = signer,
+        space = ANCHOR_DISCRIMINATOR + User::INIT_SPACE,
+        seeds = [signer.key().as_ref()],
+        bump
+    )]
+    pub user_account: Account<'info, User>,
+    pub system_program : Program<'info, System>
+}
+
+
+pub fn process_initialize_user(ctx: Context<InitUser>, usdc_bank_account: Pubkey) -> Result<()>{
+    let user = &mut ctx.accounts.user_account;
+    user.owner = ctx.accounts.signer.key();
+    user.usdc_address = usdc_bank_account;
+
+    let now = Clock::get()?.unix_timestamp;
+    user.last_updated = now;
+    Ok(())
+}
