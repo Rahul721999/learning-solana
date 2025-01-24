@@ -21,12 +21,14 @@ pub mod lending {
     }
 
     /// initialize_user account
-    pub fn initialize_user(ctx: Context<InitUser>, usdc_bank_account: Pubkey) -> Result<()>{
+    pub fn initialize_user(ctx: Context<InitUser>, usdc_bank_account: Pubkey) -> Result<()> {
         process_initialize_user(ctx, usdc_bank_account)
     }
 
-    // deposite token
-
+    /// deposite token
+    pub fn deposite(ctx: Context<Deposite>, amount: u64) -> Result<()> {
+        process_deposite(ctx, amount)
+    } 
     // withdraw token
 
     // borrow Loan

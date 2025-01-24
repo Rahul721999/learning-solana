@@ -43,9 +43,8 @@ pub fn process_initialize_bank(
     Ok(())
 }
 
-
 #[derive(Accounts)]
-pub struct InitUser<'info>{
+pub struct InitUser<'info> {
     #[account(mut)]
     pub signer: Signer<'info>,
 
@@ -57,15 +56,14 @@ pub struct InitUser<'info>{
         bump
     )]
     pub user_account: Account<'info, User>,
-    pub system_program : Program<'info, System>
+    pub system_program: Program<'info, System>,
 }
 
-
-pub fn process_initialize_user(ctx: Context<InitUser>, usdc_bank_account: Pubkey) -> Result<()>{
+pub fn process_initialize_user(ctx: Context<InitUser>, usdc_bank_account: Pubkey) -> Result<()> {
     let user = &mut ctx.accounts.user_account;
     user.owner = ctx.accounts.signer.key();
     user.usdc_address = usdc_bank_account;
-
+    
     let now = Clock::get()?.unix_timestamp;
     user.last_updated = now;
     Ok(())
