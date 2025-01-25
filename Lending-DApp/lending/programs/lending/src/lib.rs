@@ -1,6 +1,7 @@
 mod constants;
 mod instructions;
 mod state;
+mod error;
 
 use anchor_lang::prelude::*;
 use instructions::*;
@@ -30,6 +31,9 @@ pub mod lending {
         process_deposite(ctx, amount)
     } 
     // withdraw token
+    pub fn withdraw(ctx: Context<Withdraw>, amount: u64) -> Result<()>{
+        process_withdraw(ctx, amount)
+    }
 
     // borrow Loan
 

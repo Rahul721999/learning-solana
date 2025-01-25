@@ -46,10 +46,10 @@ pub struct Deposite<'info> {
 }
 
 /*
-    1. CPI transfer from user's token account to bank's token account
-    2. Calculate new shares to be added to the bank
-    3. Update user's deposited amount and total collateral value
-    4. Update bank's total deposited and total deposit shares
+ *1. CPI transfer from user's token account to bank's token account
+ *2. Calculate new shares to be added to the bank
+ *3. Update user's deposited amount and total collateral value
+ *4. Update bank's total deposited and total deposit shares
 */
 pub fn process_deposite(ctx: Context<Deposite>, amount: u64) -> Result<()> {
     // prepare accounts required for CPI transfer
@@ -74,9 +74,9 @@ pub fn process_deposite(ctx: Context<Deposite>, amount: u64) -> Result<()> {
         bank.total_deposit_shares = amount;
     }
 
-    /*  NOTE: checked_ prefix performs a safe division operation. That returns a Option type, which will be none
-       if the division results in a arithmatic overflow or zero
-    */
+    // Use checked division to avoid runtime panics from zero or overflow issues.
+    // This ensures that division is safe and returns `None` if the operation is invalid.
+
     let deposit_ratio = amount.checked_div(bank.total_deposits).unwrap();
     let users_shares = deposit_ratio
         .checked_mul(bank.total_deposit_shares)

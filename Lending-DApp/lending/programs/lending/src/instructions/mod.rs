@@ -10,4 +10,4 @@ pub use admin::*;
 pub use deposite::*;
 // pub use liquidate::*;
 // pub use repay::*;
-// pub use withdraw::*;
+pub use withdraw::*;
