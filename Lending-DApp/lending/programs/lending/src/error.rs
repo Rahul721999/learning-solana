@@ -8,4 +8,6 @@ pub enum ErrorCode {
     InsufficientShares,
     #[msg("Arithmetic Error")]
     ArithmeticError,
+    #[msg("Over borrowable limit")]
+    OverBorrowableLimit,
 }

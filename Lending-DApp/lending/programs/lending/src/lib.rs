@@ -10,6 +10,8 @@ declare_id!("GHeNTmRLi6cM8mxrgz5jhys5kwnVPJEUNp19ykyWofqP");
 
 #[program]
 pub mod lending {
+    use instructions::borrow::process_borrow;
+
     use super::*;
 
     /// initialize bank account
@@ -36,6 +38,9 @@ pub mod lending {
     }
 
     // borrow Loan
+    pub fn borrow(ctx: Context<Borrow>, amount: u64) -> Result<()> {
+        process_borrow(ctx, amount)
+    }
 
     // repay Loan
 
