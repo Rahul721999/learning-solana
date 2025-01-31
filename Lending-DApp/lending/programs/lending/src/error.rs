@@ -11,5 +11,7 @@ pub enum ErrorCode {
     #[msg("Over borrowable limit")]
     OverBorrowableLimit,
     #[msg("Over Repay is not allowed")]
-    OverRepay
+    OverRepay,
+    #[msg("Not under collateralized")]
+    NotUndercollateralized
 }
